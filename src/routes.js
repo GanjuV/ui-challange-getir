@@ -10,6 +10,7 @@ const routes = [
     path: '/',
     element: <MainLayout />,
     children: [
+      { path: '/', element: <Navigate to="/today" /> },
       { path: '/today', element: <TodayView /> },
       { path: 'upcoming', element: <UpcomingView /> },
       { path: '404', element: <NotFoundView /> },
