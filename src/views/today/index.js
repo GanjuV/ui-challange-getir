@@ -5,6 +5,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
+import Results from './Results';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +26,7 @@ const Today = () => {
     >
       <Container maxWidth={false}>
         <Box mt={3}>
-         Today: The page you are looking is under process.
+          <Results />
         </Box>
       </Container>
     </Page>

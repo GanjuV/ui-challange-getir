@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   Avatar,
@@ -78,9 +78,7 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       >
         <Avatar
           className={classes.avatar}
-          component={RouterLink}
           src={user.avatar}
-          to="/app/account"
         />
         <Typography
           className={classes.name}
