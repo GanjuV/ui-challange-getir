@@ -5,7 +5,7 @@ import * as TaskActions from 'src/actions/taskTypes';
 const intialState = {
   list: [{
     "id": "e657e7d3-a94d-47ae-b0c0-1e184fe1e469",
-    "task": "Added code to change ui",
+    "task": "Added code to change table ui",
     "createdAt": "2020-11-13T14:37:40.654Z",
     "status": "Complete",
     "completedBy": "2020-11-13T14:37:40.654Z"

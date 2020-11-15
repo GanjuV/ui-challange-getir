@@ -11,17 +11,14 @@ import { useForm, Form } from 'src/components/useForm';
 
 const initialFValues = {
   task: '',
-  createdAt: new Date(),
+  createdAt: new Date().toString(),
   status: 'Incomplete',
-  completedBy: new Date()
+  completedBy: new Date().toString()
 };
 
-const status = [
-  { id: 'Incomplete', title: 'Incomplete' },
-  { id: 'Complete', title: 'Complete' }
-];
-
 const Task = ({ addOrEdit, recordForEdit }) => {
+  const [completed, setCompleted] = useState(false);
+  
   const validate = (fieldValues = values) => {
     const temp = { ...errors };
     if ('task' in fieldValues) {
@@ -44,21 +41,19 @@ const Task = ({ addOrEdit, recordForEdit }) => {
     handleInputChange,
     resetForm
   } = useForm(initialFValues, true, validate);
-  const [completed, setCompleted] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validate()) {
-      setCompleted(false);
+    if (validate()) 
       addOrEdit(values, resetForm);
-    }
   };
 
   useEffect(() => {
-    if (recordForEdit != null) {
+    if (recordForEdit != null){
       setValues({
         ...recordForEdit
       });
-      setCompleted(true);
+      setCompleted(recordForEdit.status === "Complete")
     }
   }, [recordForEdit]);
 
@@ -74,6 +69,7 @@ const Task = ({ addOrEdit, recordForEdit }) => {
           xs={12}
         >
           <Controls.Input
+            disabled={completed}
             name="task"
             label="Task"
             value={values.task}
@@ -87,28 +83,13 @@ const Task = ({ addOrEdit, recordForEdit }) => {
           xs={12}
         >
           <Controls.DatePicker
+            disabled={completed}
             name="completedBy"
             label="Completion Date"
             value={values.completedBy}
             onChange={handleInputChange}
           />
         </Grid>
-        { completed
-          && (
-          <Grid
-            item
-            md={12}
-            xs={12}
-          >
-            <Controls.RadioGroup
-              name="status"
-              label="Status"
-              value={values.status}
-              onChange={handleInputChange}
-              items={status}
-            />
-          </Grid>
-          )}
       </Grid>
       <Box
         display="flex"
@@ -120,7 +101,7 @@ const Task = ({ addOrEdit, recordForEdit }) => {
           color="primary"
           variant="contained"
         >
-          Save details
+          {completed ? "Close": "Save details" }
         </Button>
       </Box>
     </Form>

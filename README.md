@@ -21,7 +21,6 @@ Checkout this repo, install dependencies, then start the process with the follow
 > npm start
 ```
 
-
 #### Not Familiar with Git?
 Click [here](https://github.com/GanjuV/ui-challange-getir/releases) then download the .zip file.  Extract the contents of the zip file, then open your terminal, change to the project directory, and:
 
@@ -31,3 +30,7 @@ Click [here](https://github.com/GanjuV/ui-challange-getir/releases) then downloa
 ```
 
 Goto `http://localhost:3000/` for openning the application
+
+### App deployed
+Application is deployed on below link
+https://todo-task-getir.herokuapp.com/

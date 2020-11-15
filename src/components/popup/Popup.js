@@ -22,7 +22,6 @@ const Popup = (props) => {
       <Dialog
         open={openPopup}
         TransitionComponent={Transition}
-        keepMounted
         onClose={handleClose}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"

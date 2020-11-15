@@ -4,82 +4,81 @@ import PropTypes from 'prop-types';
 import { v4 as uuid } from 'uuid';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import * as taskService from 'src/services/TaskService';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+
 import {
-  Box,
   Card,
-  Table,
   TableBody,
   TableCell,
-  TableHead,
-  TablePagination,
   TableRow,
   Typography,
   makeStyles,
   Toolbar,
   InputAdornment,
-  Button
+  Button,
+  Checkbox
 } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import { Search } from 'react-feather';
+import {
+  Add as AddIcon,
+  Search as SearchIcon} from '@material-ui/icons';
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import Popup from 'src/components/popup/Popup';
 import Controls from 'src/components/controls/Controls';
 import Task from './forms/Task';
 import { addTask, searchTask, getAllTask, updateTask } from 'src/actions/taskActions';
+import useTable from 'src/components/useTable';
 
+const headCells = [
+  { id: 'checkbox', label: '' },
+  { id: 'task', label: 'Task Name' },
+  { id: 'status', label: 'Status' },
+  { id: 'createdAt', label: 'Created Date' },
+  { id: 'completeAt', label: 'Complete Date' },
+  { id: 'action', label: '' }
+]
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: theme.spacing(3),
-    '& thead th': {
-      fontWeight: '600',
-      fontSize: '15px',
-      color: 'white',
-      backgroundColor: theme.palette.primary.light,
-    },
-    '& tbody td': {
-      fontWeight: '300',
-    },
-    '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
-      cursor: 'pointer',
-    },
+    overflowX: "auto"
   },
   pageContent: {
     margin: theme.spacing(2),
     padding: theme.spacing(2)
   },
   searchInput: {
-    width: '75%'
+    width: '65%'
   },
   newButton: {
     position: 'absolute',
     right: '10px'
+  },
+  editButton: {
+    margin: theme.spacing(0.5)
+  },
+  table: {
+    minWidth: 650
   }
 }));
 
 const Results = ({ className }) => {
-  const selector = useSelector(state => state);
+  const { task: { list } } = useSelector(state => state);
   const dispatch = useDispatch();
   const classes = useStyles();
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(0);
   const [openPopup, setOpenPopup] = useState(false);
   const [recordForEdit, setRecordForEdit] = useState(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
 
   useEffect(() => {
     dispatch(getAllTask())
   }, [dispatch]);
   
-  const handleLimitChange = (event) => {
-    setLimit(event.target.value);
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-  };
+  const {
+    TblContainer,
+    TblHead,
+    TblPagination,
+    recordsAfterPaging
+  } = useTable(list, headCells);
 
   const getTextColor = (status) => {
     return { color: status === 'Complete' ? '#85B215' : '#B23015' };
@@ -92,7 +91,6 @@ const Results = ({ className }) => {
 
   const addOrEdit = (obj, resetForm) => {
     if ('id' in obj) {
-      taskService.update(obj);
       dispatch(updateTask({
         ...obj
       }));
@@ -116,6 +114,16 @@ const Results = ({ className }) => {
     }
   };
 
+
+  const handleSelectOne = (event, obj) => {
+    console.log(obj)
+    setSelectedCustomerId(obj.id);
+    dispatch(updateTask({
+      ...obj,
+      status: 'Complete'
+    }));
+  };
+
   return (
     <Card
       className={clsx(classes.root, className)}
@@ -127,7 +135,7 @@ const Results = ({ className }) => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search />
+                <SearchIcon />
               </InputAdornment>)
           }}
           onChange={handleSearch}
@@ -136,74 +144,66 @@ const Results = ({ className }) => {
           color="primary"
           variant="contained"
           className={classes.newButton}
-          onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
+          onClick={() => {setRecordForEdit(null); setOpenPopup(true); }}
         >
           <AddIcon />
-          Add task
+          Task
         </Button>
       </Toolbar>
       <PerfectScrollbar>
-        <Box minWidth={1050}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox" />
-                <TableCell>
-                  Task
-                </TableCell>
-                <TableCell>
-                  Status
-                </TableCell>
-                <TableCell>
-                  Created Date
-                </TableCell>
-                <TableCell>
-                  Complete Date
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {selector.task.list.slice(0, limit).map((taskObj) => (
-                <TableRow
-                  hover
-                  key={taskObj.id}
-                  onClick={() => handleRowClick(taskObj)}
+        <TblContainer className={classes.table} >
+          <TblHead />
+          <TableBody>
+            { recordsAfterPaging().map((taskObj) => (
+            <TableRow
+              hover
+              key={taskObj.id}
+            >
+              <TableCell padding="checkbox">
+                {
+                  taskObj.status === "Incomplete" &&
+                  <Checkbox
+                    checked={selectedCustomerId === taskObj.id}
+                    onChange={(event) => handleSelectOne(event, taskObj)}
+                    value="true"
+                  />
+                }
+              </TableCell> 
+              <TableCell>
+                <Typography
+                  color="textPrimary"
+                  variant="body1"
                 >
-                  <TableCell padding="checkbox" />
-                  <TableCell>
-                    <Typography
-                      color="textPrimary"
-                      variant="body1"
-                    >
-                      {taskObj.task}
-                    </Typography>
-                  </TableCell>
-                  <TableCell
-                    style={{ ...getTextColor(taskObj.status) }}
-                  >
-                    {taskObj.status}
-                  </TableCell>
-                  <TableCell>
-                    {moment(taskObj.createdAt).format('DD/MM/YYYY')}
-                  </TableCell>
-                  <TableCell>
-                    {moment(taskObj.completedBy).format('DD/MM/YYYY')}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+                  {taskObj.task}
+                </Typography>
+              </TableCell>
+              <TableCell
+                style={{ ...getTextColor(taskObj.status) }}
+              >
+                {taskObj.status}
+              </TableCell>
+              <TableCell>
+                {moment(taskObj.createdAt).format('DD/MM/YYYY')}
+              </TableCell>
+              <TableCell>
+                {moment(taskObj.completedBy).format('DD/MM/YYYY')}
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="secondary"
+                  className={classes.editButton}
+                  onClick={() => handleRowClick(taskObj)}>
+                    <EditOutlinedIcon fontSize="small" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+          </TableBody>
+        </TblContainer>
+        <TblPagination />
       </PerfectScrollbar>
-      <TablePagination
-        component="div"
-        count={selector.task.list.length}
-        onChangePage={handlePageChange}
-        onChangeRowsPerPage={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
       <Popup
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}

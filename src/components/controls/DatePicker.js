@@ -5,7 +5,7 @@ import DateFnsUtils from '@date-io/date-fns';
 
 const DatePicker = (props) => {
   const {
-    name, label, value, onChange
+    name, label, value, onChange, ...other
   } = props;
 
   // eslint-disable-next-line no-shadow
@@ -15,6 +15,13 @@ const DatePicker = (props) => {
     }
   });
 
+  const disablePrevDates = (startDate) => {
+    const startSeconds = Date.parse(new Date());
+    return (date) => {
+      return Date.parse(date) < startSeconds;
+    }
+  }
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <KeyboardDatePicker
@@ -23,11 +30,12 @@ const DatePicker = (props) => {
         format="MMM/dd/yyyy"
         name={name}
         value={value}
-        onChange={(date) => onChange(convertToDefEventPara(name, date))}
+        shouldDisableDate={disablePrevDates()}
+        onChange={(date) => onChange(convertToDefEventPara(name, date.toString()))}
         KeyboardButtonProps={{
           'aria-label': 'change date',
         }}
-
+        {...other}
       />
     </MuiPickersUtilsProvider>
   );
@@ -36,7 +44,7 @@ const DatePicker = (props) => {
 DatePicker.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
-  value: PropTypes.object,
+  value: PropTypes.string,
   onChange: PropTypes.func
 };
 

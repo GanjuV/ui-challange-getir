@@ -12,9 +12,9 @@ import {
   makeStyles
 } from '@material-ui/core';
 import {
-  Calendar as CalendarIcon,
-  Users as UsersIcon
-} from 'react-feather';
+  CalendarToday as CalendarIcon,
+  DateRange as UpcomingIcon
+} from '@material-ui/icons';
 import NavItem from './NavItem';
 
 // DATA
@@ -32,7 +32,7 @@ const items = [
   },
   {
     href: '/upcoming',
-    icon: UsersIcon,
+    icon: UpcomingIcon,
     title: 'Upcoming'
   }
 ];
@@ -61,7 +61,6 @@ const NavBar = ({ onMobileClose, openMobile }) => {
     if (openMobile && onMobileClose) {
       onMobileClose();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const content = (
